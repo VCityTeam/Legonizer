@@ -1,9 +1,10 @@
 const THREE = require('three');
 
 /**
- *
+ * Transform BufferGeometry into an heightmap with THREE js raycast with a specific ratio that will be 
+ * the maximum number of ray launch in x axis
  * @param {BufferGeometry} geometryBuffer Geometry that will be transform in heightmap
- * @param {Int32Array} ratio ratio to discretise modelisation
+ * @param {Int32Array} ratio ratio to voxelize the modelisation
  */
 const legonizer = function(geometryBuffer, ratio) {
 
@@ -52,7 +53,7 @@ const legonizer = function(geometryBuffer, ratio) {
   }
   
   /**
-   * generate CSV file from an heightmap
+   * Generate CSV file from an array in two dimension. The CSV file be automatically download in your browser
    * @param {Array} heightMap Array in two dimension that will be integrated in the CSV file
    */
   const generateCSVwithHeightMap = function(heightMap) {
