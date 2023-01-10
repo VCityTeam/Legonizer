@@ -1,3 +1,4 @@
+const { Box3, Vector3 } = require('three');
 const THREE = require('three');
 
 /**
@@ -6,7 +7,7 @@ const THREE = require('three');
  * @param {BufferGeometry} geometryBuffer Geometry that will be transform in heightmap
  * @param {Int32Array} ratio ratio to voxelize the modelisation
  */
-const legonizer = function(geometryBuffer, ratio) {
+const createHeightMapFromBufferGeometry = function(geometryBuffer, ratio) {
 
     if (!geometryBuffer.attributes.position.array) throw new Error('geometryBuffer empty');
 
@@ -51,6 +52,29 @@ const legonizer = function(geometryBuffer, ratio) {
     }
     return heightMap;
   }
+
+  /**
+   * 
+   * @param {Box3} boundingBox 
+   * @param {*} xPlates 
+   * @param {*} yPlates 
+   * @returns 
+   */
+  const transformBBToLegoPlates = function(boundingBox, xPlates, yPlates){
+    const listLegoPlatesBB = [];
+    const ratioX = boundingBox.max.x - boundingBox.min.x;
+    const ratioY = boundingBox.max.y - boundingBox.min.y;
+    for( let j = 0; j < yPlates; j++){
+      for ( let i = 0; i < xPlates; i++){
+        const boundingBoxLego = new THREE.Box3(
+          new THREE.Vector3(boundingBox.min.x + (i * ratioX), boundingBox.min.y + (j * ratioY), boundingBox.min.z),
+          new THREE.Vector3(boundingBox.max.x - ((xPlates - (i + 1)) * ratioX), boundingBox.max.y - ((yPlates - (j + 1)) * ratioY), boundingBox.max.z));
+
+          listLegoPlatesBB.push(boundingBoxLego);
+      }
+    }
+    return listLegoPlatesBB;
+  }
   
   /**
    * Generate CSV file from an array in two dimension. The CSV file be automatically download in your browser
@@ -59,7 +83,8 @@ const legonizer = function(geometryBuffer, ratio) {
   const generateCSVwithHeightMap = function(heightMap) {
     let csvContent = 'data:text/csv;charset=utf-8,';
   
-    for (let j = heightMap.length - 1; j >= 0; j--) {
+    //Complete CSV
+    for (let j = heightMap.length - 1; j >= 0; j--) { //decrement because the filling start in top left 
       const value = heightMap[j];
       for (let i = 0; i < value.length; i++) {
         const innerValue = value[i] === null ? '' : value[i].toString();
@@ -75,4 +100,4 @@ const legonizer = function(geometryBuffer, ratio) {
     window.open(encodedUri);
   }
 
-  module.exports = {legonizer, generateCSVwithHeightMap}
+  module.exports = {createHeightMapFromBufferGeometry, generateCSVwithHeightMap, transformBBToLegoPlates}

@@ -1,6 +1,6 @@
 /** */
 
 // API Legonizer
-const {legonizer, generateCSVwithHeightMap} = require('./DataProcessing.js');
+const {createHeightMapFromBufferGeometry, generateCSVwithHeightMap, transformBBToLegoPlates} = require('./DataProcessing.js');
 
-module.exports = {legonizer, generateCSVwithHeightMap};
+module.exports = {createHeightMapFromBufferGeometry, generateCSVwithHeightMap, transformBBToLegoPlates};
