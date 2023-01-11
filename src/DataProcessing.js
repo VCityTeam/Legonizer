@@ -19,15 +19,12 @@ const createHeightMapFromBufferGeometry = function(geometryBuffer, ratio) {
     const bbMockUp = geometryBuffer.boundingBox;
     const widthMockUp = bbMockUp.max.x - bbMockUp.min.x;
     const stepDistance = widthMockUp / ratio;
-    const ratioY = Math.trunc(
-      Math.abs(bbMockUp.min.y - bbMockUp.max.y) / stepDistance
-    );
     const mesh = new THREE.Mesh(geometryBuffer);
     const raycaster = new THREE.Raycaster();
     const maxZMockup = bbMockUp.max.z;
-    const heightMap = Array.from(Array(ratioY), () => new Array(ratio));
+    const heightMap = Array.from(Array(ratio), () => new Array(ratio));
   
-    for (let j = 0; j < ratioY; j++) {
+    for (let j = 0; j < ratio; j++) {
       for (let i = 0; i < ratio; i++) {
         const positionRaycast = new THREE.Vector3(
           bbMockUp.min.x + i * stepDistance,
@@ -80,7 +77,7 @@ const createHeightMapFromBufferGeometry = function(geometryBuffer, ratio) {
    * Generate CSV file from an array in two dimension. The CSV file be automatically download in your browser
    * @param {Array} heightMap Array in two dimension that will be integrated in the CSV file
    */
-  const generateCSVwithHeightMap = function(heightMap) {
+  const generateCSVwithHeightMap = function(heightMap, name) {
     let csvContent = 'data:text/csv;charset=utf-8,';
   
     //Complete CSV
@@ -96,8 +93,13 @@ const createHeightMapFromBufferGeometry = function(geometryBuffer, ratio) {
       csvContent += '\n';
     }
   
-    const encodedUri = encodeURI(csvContent);
-    window.open(encodedUri);
+    let encodedUri = encodeURI(csvContent);
+    let link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', name);
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
   }
 
   module.exports = {createHeightMapFromBufferGeometry, generateCSVwithHeightMap, transformBBToLegoPlates}
