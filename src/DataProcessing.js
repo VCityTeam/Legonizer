@@ -1,4 +1,3 @@
-const { Box3, Vector3 } = require('three');
 const THREE = require('three');
 
 /**
@@ -19,12 +18,15 @@ const createHeightMapFromBufferGeometry = function(geometryBuffer, ratio) {
     const bbMockUp = geometryBuffer.boundingBox;
     const widthMockUp = bbMockUp.max.x - bbMockUp.min.x;
     const stepDistance = widthMockUp / ratio;
+    const ratioY = Math.trunc(
+      Math.abs(bbMockUp.min.y - bbMockUp.max.y) / stepDistance
+    );
     const mesh = new THREE.Mesh(geometryBuffer);
     const raycaster = new THREE.Raycaster();
     const maxZMockup = bbMockUp.max.z;
-    const heightMap = Array.from(Array(ratio), () => new Array(ratio));
+    const heightMap = Array.from(Array(ratioY), () => new Array(ratio));
   
-    for (let j = 0; j < ratio; j++) {
+    for (let j = 0; j < ratioY; j++) {
       for (let i = 0; i < ratio; i++) {
         const positionRaycast = new THREE.Vector3(
           bbMockUp.min.x + i * stepDistance,
@@ -50,29 +52,30 @@ const createHeightMapFromBufferGeometry = function(geometryBuffer, ratio) {
     return heightMap;
   }
 
-  /**
+    /**
    * 
    * @param {Box3} boundingBox 
-   * @param {*} xPlates 
-   * @param {*} yPlates 
+   * @param {Int16Array} xPlates 
+   * @param {Int16Array} yPlates 
    * @returns 
    */
-  const transformBBToLegoPlates = function(boundingBox, xPlates, yPlates){
-    const listLegoPlatesBB = [];
-    const ratioX = boundingBox.max.x - boundingBox.min.x;
-    const ratioY = boundingBox.max.y - boundingBox.min.y;
-    for( let j = 0; j < yPlates; j++){
-      for ( let i = 0; i < xPlates; i++){
-        const boundingBoxLego = new THREE.Box3(
-          new THREE.Vector3(boundingBox.min.x + (i * ratioX), boundingBox.min.y + (j * ratioY), boundingBox.min.z),
-          new THREE.Vector3(boundingBox.max.x - ((xPlates - (i + 1)) * ratioX), boundingBox.max.y - ((yPlates - (j + 1)) * ratioY), boundingBox.max.z));
-
-          listLegoPlatesBB.push(boundingBoxLego);
-      }
-    }
-    return listLegoPlatesBB;
-  }
+    const transformBBToLegoPlates = function(boundingBox, xPlates, yPlates){
+      // const listLegoPlatesBB = [];
+      const listLegoPlatesBB = Array.from(Array(parseInt(yPlates)), () => new Array(parseInt(xPlates)));
+      const ratioX = boundingBox.max.x - boundingBox.min.x;
+      const ratioY = boundingBox.max.y - boundingBox.min.y;
+      console.log(listLegoPlatesBB.length);
+      for( let j = 0; j < yPlates; j++){
+        for ( let i = 0; i < xPlates; i++){
+          const boundingBoxLego = new THREE.Box3(
+            new THREE.Vector3(boundingBox.min.x + (i * ratioX), boundingBox.min.y + (j * ratioY), boundingBox.min.z),
+            new THREE.Vector3(boundingBox.max.x - ((xPlates - (i + 1)) * ratioX), boundingBox.max.y - ((yPlates - (j + 1)) * ratioY), boundingBox.max.z));
   
+            listLegoPlatesBB[j][i] = boundingBoxLego;
+        }
+      }
+      return listLegoPlatesBB;
+    }
   /**
    * Generate CSV file from an array in two dimension. The CSV file be automatically download in your browser
    * @param {Array} heightMap Array in two dimension that will be integrated in the CSV file
