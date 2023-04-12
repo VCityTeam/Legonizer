@@ -25,5 +25,6 @@
   "homepage": "https://github.com/VCityTeam/Legonizer#readme",
   "dependencies": {
     "three": "^0.147.0"
-  }
+  },
+  "devDependencies": {}
 }
