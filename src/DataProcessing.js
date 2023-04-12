@@ -5,6 +5,9 @@ const THREE = require('three');
  * the maximum number of ray launch in x axis
  * @param {BufferGeometry} geometryBuffer Geometry that will be transform in heightmap
  * @param {Int32Array} ratio ratio to voxelize the modelisation
+ * @param {Int32Array} xPlates width in plates of the lego mockup
+ * @param {Int32Array} yPlates lenght in plates of the lego mockup
+ * @returns {Array} the heightmaps of the geometry
  */
 const createHeightMapFromBufferGeometry = function(geometryBuffer, ratio, xPlates, yPlates) {
 
@@ -15,10 +18,10 @@ const createHeightMapFromBufferGeometry = function(geometryBuffer, ratio, xPlate
   geometryBuffer.computeBoundingBox(); //Generate Bounding box of the geometry
   const ratioX = xPlates;
   const ratioY = yPlates;
-  const maxLegoHeight = 10;
+  const maxLegoHeight = 10; // Max lego height for the higher buildings in the geometry
   const bbMockUp = geometryBuffer.boundingBox;
   const widthMockUp = bbMockUp.max.x - bbMockUp.min.x;
-  const stepDistance = widthMockUp / ratio / ratioX;
+  const stepDistance = widthMockUp / ratio / ratioX; // Step to launch a ray 
   const mesh = new THREE.Mesh(geometryBuffer);
   const raycaster = new THREE.Raycaster();
   const maxZMockup = bbMockUp.max.z;
@@ -42,7 +45,7 @@ const createHeightMapFromBufferGeometry = function(geometryBuffer, ratio, xPlate
     }
   }
   // Lego transformation
-  const ratioZ = maxZMockup / maxLegoHeight;
+  const ratioZ = maxZMockup / maxLegoHeight; // Divide the size in Z with the maximum height of the building in the geometry - Maybe should be calculate differently if there is to much difference between the higher and the shorter ex : Skyscrapers
   for (let i = 0; i < heightMap.length; i++) {
     for (let j = 0; j < heightMap[i].length; j++)
       heightMap[i][j] = Math.trunc(heightMap[i][j] / ratioZ);
@@ -51,11 +54,11 @@ const createHeightMapFromBufferGeometry = function(geometryBuffer, ratio, xPlate
 }
 
     /**
-   * 
-   * @param {Box3} boundingBox 
-   * @param {Int16Array} xPlates 
-   * @param {Int16Array} yPlates 
-   * @returns 
+   * Transform a bounding box in shorter BB with a size of lego plates
+   * @param {Box3} boundingBox original bounding volume to transform
+   * @param {Int16Array} xPlates width in plates to divide de BB
+   * @param {Int16Array} yPlates lenght in plates to divide de BB
+   * @returns {Array} the list of BB
    */
     const transformBBToLegoPlates = function(boundingBox, xPlates, yPlates){
       // const listLegoPlatesBB = [];
@@ -77,6 +80,7 @@ const createHeightMapFromBufferGeometry = function(geometryBuffer, ratio, xPlate
   /**
    * Generate CSV file from an array in two dimension. The CSV file be automatically download in your browser
    * @param {Array} heightMap Array in two dimension that will be integrated in the CSV file
+   * @param {String} name name of your CSV file output
    */
   const generateCSVwithHeightMap = function(heightMap, name) {
     let csvContent = 'data:text/csv;charset=utf-8,';
