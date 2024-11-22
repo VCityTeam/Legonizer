@@ -1,6 +1,6 @@
 {
   "name": "legonizer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Data processing of 3D geometries",
   "main": "src/Legonizer.js",
   "scripts": {
